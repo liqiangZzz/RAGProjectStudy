@@ -1,6 +1,6 @@
 # RAGProjectStudy
 
-RAG（Retrieval-Augmented Generation，检索增强生成）学习项目，基于 LangChain 与 LangGraph，按学习阶段分为四个章节，每章为独立 Python 包，内含按编号组织的示例脚本。
+RAG（Retrieval-Augmented Generation，检索增强生成）学习项目，基于 LangChain 与 LangGraph，按学习阶段分为五个章节，每章为独立 Python 包，内含按编号组织的示例脚本。模型接入：DeepSeek / GLM（LangChain `init_chat_model`）、DashScope（重排序与 Embedding）。
 
 ## 目录结构
 
@@ -38,8 +38,18 @@ RAGProjectStudy/
 │   ├── 02_adaptive_retrieval_self_correction_rag.py # 自适应检索自校正 RAG
 │   ├── 03_langgraph_hybrid_rag.py               # LangGraph 混合 RAG
 │   └── images/
+├── 05_RAG评估/                  # RAG 检索评估指标（模拟 LLM Judge，不接真实 API）
+│   └── 01_评估检索层/           # 检索层（Retrieval）评估
+│       ├── 01_hit_at_k_case.py               # Hit@K（命中率）
+│       ├── 02_precision_at_k_case.py         # Precision@K（精确率）
+│       ├── 03_recall_at_k_case.py            # Recall@K（召回率）
+│       ├── 04_mrr_case.py                    # MRR（平均倒数排名）
+│       ├── 05_ndcg_at_k_case.py              # NDCG@K（归一化折损累计增益）
+│       ├── 06_context_precision_at_k_case.py # Context Precision@K（上下文精确率，RAGAS 口径）
+│       └── 07_context_recall_at_k_case.py    # Context Recall@K（上下文召回率，RAGAS 口径）
 ├── env_utils.py                 # 环境变量读取工具
 ├── init_llm.py                  # LLM 初始化
+├── requirements.txt             # 依赖清单（含全部锁定版本，一键安装）
 └── .env.example                 # 环境变量模板
 ```
 
@@ -52,18 +62,38 @@ RAGProjectStudy/
 ## 环境准备
 
 ```bash
-# 创建虚拟环境
-python -m venv .venv
-source .venv/bin/activate
+# 克隆项目
+git clone git@github.com:liqiangZzz/RAGProjectStudy.git
+cd RAGProjectStudy
 
-# 安装依赖（按各脚本实际 import 安装，如 langchain、langgraph、pymilvus 等）
+# 创建虚拟环境（建议 Python 3.12+，生成环境为 3.14.x）
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+python -m pip install --upgrade pip
+
+# 一键安装全部依赖（requirements.txt 已锁定全部 101 个包的版本）
+pip install -r requirements.txt
 
 # 配置环境变量
 cp .env.example .env
-# 编辑 .env 填入 API Key 等配置
+# 编辑 .env 填入 API Key：DEEPSEEK_API_KEY / GLM_API_KEY / DASHSCOPE_API_KEY 等
 ```
 
-> 注意：`.env` 包含密钥，已被 `.gitignore` 过滤，不会提交到远程仓库。
+> 注意：
+> - `.env` 包含密钥，已被 `.gitignore` 过滤，不会提交到远程仓库，新电脑需用 `.env.example` 模板重新配置。
+> - `milvus-lite` / `faiss-cpu` 无 Windows 原生包，Windows 用户建议使用 WSL2，或让 pymilvus 直连远程 Milvus 服务器。
+
+## 评估指标速览（05_RAG评估）
+
+| 指标 | 中文名 | 回答的问题 | 排名敏感 |
+|---|---|---|---|
+| Hit@K | 命中率 | 前 K 条里有没有命中相关来源 | 否 |
+| Precision@K | 精确率 | 前 K 条里命中了几个（结果干净度） | 否 |
+| Recall@K | 召回率 | 该找的相关来源找全了没有 | 否 |
+| MRR | 平均倒数排名 | 第一个相关来源排得多靠前 | 是 |
+| NDCG@K | 归一化折损累计增益 | 整体排序质量（log2 位置折损 + 理想排序归一化） | 是 |
+| Context Precision@K | 上下文精确率（RAGAS） | 有用的切片是否排在靠前位置（Chunk 级 verdict） | 是 |
+| Context Recall@K | 上下文召回率（RAGAS） | 参考答案的事实声明被前 K 条切片支撑的比例（Claim 级归因） | 否 |
 
 ## 运行示例
 
