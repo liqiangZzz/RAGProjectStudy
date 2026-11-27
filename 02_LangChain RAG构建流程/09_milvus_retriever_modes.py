@@ -1,6 +1,6 @@
 from langchain_community.embeddings import DashScopeEmbeddings
-from langchain_milvus import Milvus
 from langchain_core.documents import Document
+from langchain_milvus import Milvus
 from pymilvus import MilvusClient, DataType
 
 from env_utils import DASHSCOPE_API_KEY

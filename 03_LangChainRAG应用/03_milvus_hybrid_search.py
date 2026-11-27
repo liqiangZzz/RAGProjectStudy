@@ -3,7 +3,7 @@
 from typing import List
 
 from langchain_community.embeddings import DashScopeEmbeddings
-from pymilvus import MilvusClient, DataType, Function, FunctionType, AnnSearchRequest, RRFRanker, WeightedRanker
+from pymilvus import MilvusClient, DataType, Function, FunctionType, AnnSearchRequest, WeightedRanker
 
 from env_utils import DASHSCOPE_API_KEY
 

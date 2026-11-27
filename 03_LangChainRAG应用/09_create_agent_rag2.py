@@ -3,9 +3,9 @@
 # ============================================================
 from langchain.agents import create_agent
 from langchain_community.embeddings import DashScopeEmbeddings
-from langchain_milvus import Milvus
 from langchain_core.prompts import PromptTemplate
 from langchain_core.tools import create_retriever_tool
+from langchain_milvus import Milvus
 from pymilvus import MilvusClient, DataType
 
 from env_utils import DASHSCOPE_API_KEY
